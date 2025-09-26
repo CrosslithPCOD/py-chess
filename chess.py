@@ -39,18 +39,39 @@ pieces = [
     # [color,piece,verti,hori,points,moved]
     ['w','♔','e','1',0,'n'],  # white king 1
     ['w','♕','d','1',9,'n'],  # white queen 1
-    ['w','♖','a','3',5,'n'],  # white rook 1
+    ['w','♖','a','1',5,'n'],  # white rook 1
+    ['w','♖','h','1',5,'n'],  # white rook 2
+    ['w','♗','c','1',3,'n'],  # white bishop 1
     ['w','♗','f','1',3,'n'],  # white bishop 2
+    ['w','♘','b','1',3,'n'],  # white knight 1
     ['w','♘','g','1',3,'n'],  # white knight 2
     
     ['w','♙','a','2',1,'n'],  # white pawn 1
-    ['w','♙','a','4',1,'n'],  # white pawn 1
+    ['w','♙','b','2',1,'n'],  # white pawn 2
+    ['w','♙','c','2',1,'n'],  # white pawn 3
     ['w','♙','d','2',1,'n'],  # white pawn 4
+    ['w','♙','e','2',1,'n'],  # white pawn 5
+    ['w','♙','f','2',1,'n'],  # white pawn 6
+    ['w','♙','g','2',1,'n'],  # white pawn 7
+    ['w','♙','h','2',1,'n'],  # white pawn 8
     
-    ['b','♟','f','2',1,'n'],  # black pawn 1
-    ['b','♟','f','3',1,'n'],  # black pawn 1
-    ['b','♟','g','2',1,'n'],  # black pawn 1
-    ['b','♟','g','3',1,'n'],  # black pawn 1
+    ['b','♚','e','8',0,'n'],  # black king 1
+    ['b','♛','d','8',9,'n'],  # black queen 1
+    ['b','♜','a','8',5,'n'],  # black rook 1
+    ['b','♜','h','8',5,'n'],  # black rook 2
+    ['b','♝','c','8',3,'n'],  # black bishop 1
+    ['b','♝','f','8',3,'n'],  # black bishop 2
+    ['b','♞','b','8',3,'n'],  # black knight 1
+    ['b','♞','g','8',3,'n'],  # black knight 2
+    
+    ['b','♟','a','7',1,'n'],  # black pawn 1
+    ['b','♟','b','7',1,'n'],  # black pawn 2
+    ['b','♟','c','7',1,'n'],  # black pawn 3
+    ['b','♟','d','7',1,'n'],  # black pawn 4
+    ['b','♟','e','7',1,'n'],  # black pawn 5
+    ['b','♟','f','7',1,'n'],  # black pawn 6
+    ['b','♟','g','7',1,'n'],  # black pawn 7
+    ['b','♟','h','7',1,'n'],  # black pawn 8
 ]
 
 ### FUNCTIONS
@@ -75,10 +96,10 @@ def startGame():
     print("")
     try:
         while True:
-            inp = "Y" #input("START THE GAME? Y/N: ").strip().upper()
+            inp = input("START THE GAME? Y/N: ").strip().upper()
             if inp == "Y":
-                plyr1 = "White" # input("Name player 1 (white): ")
-                plyr2 = "Black" # input("Name player 2 (black): ")
+                plyr1 = input("Name player 1 (white): ")
+                plyr2 = input("Name player 2 (black): ")
                 plyr1 = plyr1 + " (white)"
                 plyr2 = plyr2 + " (black)"
                 return True
@@ -91,9 +112,9 @@ def startGame():
         print("Something went wrong:", e)
         return False
 
+# boring input checks
 def checkPiece(A):
     global selectedPiece, forfeit
-    #try:
     A = A.upper()
     if not A == "FORFEIT":
         if not A == "" and not A == "00" and len(A) == 2:
@@ -123,13 +144,9 @@ def checkPiece(A):
     else:
         forfeit = True
         return "Forfeit"
-    #except:
-    #    print("An unexpected error occurred, try again.")
-    #    return False
 
 def makeMovement(A,B):
     global pieces, pointsW, pointsB, winner, checkMate
-    #try:
     # basic input checks
     if not A == "":
         A = A.lower()
@@ -229,6 +246,7 @@ def canMove(Aa,Ab,Ba,Bb):
     CAa = Aa
     CAb = Ab
     
+    # more pawn logic
     for q in pieces:
         if q[2] == Ba and q[3] == Bb:
             target = True
@@ -319,7 +337,7 @@ def canMove(Aa,Ab,Ba,Bb):
             else:
                 return True
 
-# piece clipping (cant move through pieces)
+# piece clipping (cant move through other pieces)
 def willClip(Aa,Ab,Ba,Bb):
     # determine what piece is moving
     for p in pieces:
@@ -328,7 +346,7 @@ def willClip(Aa,Ab,Ba,Bb):
             hor = []
             ver = []
             
-            # calculate crossed tiles
+            # list crossed tiles (not including starting and ending tiles)
             if Ab > Bb:
                 for r in range(Bb+1,Ab):
                     hor.append(r)
@@ -388,6 +406,7 @@ def calcPosition(Aa,Ab,Ba,Bb):
             Bb = int(indBb)
             return Aa,Ab,Ba,Bb
 
+# crowning pawns logic (i hate trees like this)
 def finalSpaceF(aa,ab):
     for p in pieces:
         if p[2] == aa and p[3] == ab:
@@ -432,13 +451,13 @@ def finalSpaceF(aa,ab):
                         return True
 
 # return symbol for given piece (if any)
-def symbolCheck(a, b):
+def symbolCheck(a,b):
     for p in pieces:
         if p[2] == a and p[3] == b:
             return p[1]
     return None
 
-# could be done easier but i cant be arsed
+# tile color check (could be done easier but i cant be arsed as of yet)
 def colorCheck(A,N):
     pos = 0
 
@@ -448,17 +467,11 @@ def colorCheck(A,N):
         pos += 0
     elif A in ["B","D","F","H"]:
         pos += 1
-    else:
-        print("Error: Invalid A")
-        exit()
         
     if N in ["1","3","5","7"]:
         pos += 0
     elif N in ["2","4","6","8"]:
         pos += 1
-    else:
-        print("Error: Invalid N")
-        exit()
         
     if pos % 2 == 0:
         return "white"
@@ -473,7 +486,6 @@ if startGame():
         select = False
         move = False
             
-        # top row
         print()
         print("-------------------------")
         print()
@@ -497,6 +509,7 @@ if startGame():
                     # print(out, end=" ") # board positions
             print()
         print(" ", end=" ")
+        # bottom row
         for ver1 in vertical:
             print(ver1, end=" ")
         print()
@@ -508,6 +521,7 @@ if startGame():
         else:
             print("Turn " + str(turn) + " : " + plyr2)
         
+        # points announcement
         if pointsW == pointsB:
             symbol = "="
         elif pointsW > pointsB and pointsW - pointsB <= 9:
@@ -528,7 +542,7 @@ if startGame():
                 output = False
                 selPiece = input("Pick the piece to move: ")
                 output = checkPiece(selPiece)
-                if output or output == "Forfeit":
+                if output == True or output == "Forfeit":
                     select = True
                     break
             
@@ -548,8 +562,8 @@ if startGame():
             
             # if all inputs are correct start next turn
             if select and move:
-                #if not checkMate:
-                #    turn += 1
+                if not checkMate:
+                    turn += 1
                 break
         if checkMate or forfeit:
             break
